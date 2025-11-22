@@ -12,8 +12,9 @@ let
 
   tomlFormat = pkgs.formats.toml { };
 
-  configFile = tomlFormat.generate "spotifyd.conf" cfg.settings;
+  generatedConfigFile = tomlFormat.generate "spotifyd.conf" cfg.settings;
 
+  configFile = cfg.configFile or generatedConfigFile;
 in
 {
   options.services.spotifyd = {
@@ -38,6 +39,14 @@ in
             device_name = "nix";
           };
         }
+      '';
+    };
+
+    configFile = lib.mkOption {
+      type = with lib.types; nullOr (either str path);
+      default = null;
+      description = ''
+        Optional configuration file path. Setting this option overrides `settings`.
       '';
     };
   };
